@@ -1,0 +1,11 @@
+{
+    "scripts": {
+      "auth": "shopify auth login --store teamup-trial-job.myshopify.com",
+      "dev": "shopify theme dev --store teamup-trial-job.myshopify.com",
+      "pull": "shopify theme pull --store teamup-trial-job.myshopify.com",
+      "pull:dev": "shopify theme pull --development --store teamup-trial-job.myshopify.com",
+      "push": "shopify theme push --store teamup-trial-job.myshopify.com",
+      "list": "shopify theme list --store teamup-trial-job.myshopify.com",
+      "check": "shopify theme check"
+    }
+  }
