@@ -1,3 +1,8 @@
+<link
+  href="https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,400,300&display=swap"
+  rel="stylesheet"
+>
+
 {%- unless settings.type_body_font.system? -%}
   {{ settings.type_body_font | font_url | preload_tag: as: 'font', type: 'font/woff2', fetchpriority: 'low' }}
 {%- endunless -%}
