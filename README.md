@@ -21,3 +21,4 @@ With more time I would move Suitable for, Use it, and the accordion copy into pr
 
 Preview: https://teamup-trial-job.myshopify.com/
 Password: teeffa
+Loom Video: https://www.loom.com/share/87bd5cb52526427e92e4867d734b9e1e
