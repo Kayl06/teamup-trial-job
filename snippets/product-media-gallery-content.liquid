@@ -33,13 +33,19 @@
     assign variant_images = selected_product.images | where: 'attached_to_variant?', true | map: 'src'
   endif
 
+  # Featured grid always uses thumbnails on mobile (peeking main slide + thumbnail row)
+  assign mobile_controls_style = block_settings.slideshow_mobile_controls_style
+  if media_presentation == 'grid' and block_settings.media_columns == 'featured'
+    assign mobile_controls_style = 'thumbnails'
+  endif
+
   if block_settings.slideshow_controls_style == 'thumbnails'
     assign controls_on_media = false
   else
     assign controls_on_media = true
   endif
 
-  if block_settings.slideshow_mobile_controls_style == 'thumbnails'
+  if mobile_controls_style == 'thumbnails'
     assign mobile_controls_on_media = false
   else
     assign mobile_controls_on_media = true
@@ -47,16 +53,16 @@
 
   assign render_slideshow_controls = false
 
-  if media_presentation == 'carousel' or block_settings.slideshow_controls_style == block_settings.slideshow_mobile_controls_style
+  if media_presentation == 'carousel' or block_settings.slideshow_controls_style == mobile_controls_style
     assign render_slideshow_controls = true
   endif
 
   assign render_mobile_slideshow_controls = false
 
-  if block_settings.slideshow_controls_style != block_settings.slideshow_mobile_controls_style
+  if block_settings.slideshow_controls_style != mobile_controls_style
     assign slideshow_controls_class = 'mobile:hidden'
 
-    if block_settings.slideshow_mobile_controls_style != 'hint'
+    if mobile_controls_style != 'hint'
       assign render_mobile_slideshow_controls = true
     endif
   endif
@@ -132,9 +138,11 @@
     assign is_single_column = true
   endif
 
-  # Check if we need both sizes (for large first image in two-column grid)
+  # Check if we need both sizes (large first image in a two-column grid, or featured grid)
   assign needs_both_sizes = false
   if media_presentation == 'grid' and block_settings.media_columns == 'two' and block_settings.large_first_image
+    assign needs_both_sizes = true
+  elsif media_presentation == 'grid' and block_settings.media_columns == 'featured'
     assign needs_both_sizes = true
   endif
 
@@ -220,7 +228,8 @@
       /* Desktop constraint wrapper sizing */
       @media screen and (min-width: 750px) {
         .product-media-constraint-wrapper {
-          width: min(100%, calc(var(--constrained-height) * {{ block_settings.aspect_ratio }}));
+          max-width: 100%;
+          /* width: min(100%, calc(var(--constrained-height) * {{ block_settings.aspect_ratio }})); */
         }
       }
     {% endif %}
@@ -354,7 +363,7 @@
         {% if block_settings.media_columns == "two" and block_settings.large_first_image%}media-gallery--large-first-image{% endif %}
       {% endif %}
       media-gallery--{{ media_presentation }}
-      {% if block_settings.slideshow_mobile_controls_style == 'hint' %}
+      {% if mobile_controls_style == 'hint' %}
         media-gallery--hint
       {% endif %}
       {% if block_settings.extend_media %}
@@ -427,7 +436,7 @@
         {% if render_mobile_slideshow_controls %}
           {%- render 'slideshow-controls',
             class: 'desktop:hidden media-gallery__mobile-controls',
-            style: block_settings.slideshow_mobile_controls_style,
+            style: mobile_controls_style,
             item_count: sorted_media.size,
             thumbnails: sorted_media,
             controls_on_media: mobile_controls_on_media,
@@ -911,6 +920,58 @@
     .media-gallery__mobile-controls[thumbnails] .slideshow-controls__thumbnail {
       width: var(--thumbnail-width);
       height: auto;
+    }
+
+    /* Featured grid: peeking main slide + 70px square thumbnails */
+    .media-gallery--featured-column {
+      --slideshow-gap: 8px;
+
+      :not(.dialog-zoomed-gallery) > .product-media-container:not(:only-child) {
+        width: 90%;
+
+        .product-media img {
+          object-fit: cover;
+        }
+      }
+
+      /* Keep adjacent slide painted so the peek is visible */
+      :is(
+        slideshow-slide:has(+ slideshow-slide[aria-hidden='false']:last-of-type),
+        slideshow-slide[aria-hidden='false'] + slideshow-slide
+      ) {
+        content-visibility: auto;
+
+        slideshow-component[actioned] & {
+          content-visibility: visible;
+        }
+      }
+
+      .media-gallery__mobile-controls[thumbnails] {
+        --thumbnail-width: 70px;
+        margin-block-start: 8px;
+      }
+
+      .media-gallery__mobile-controls[thumbnails] .slideshow-controls__thumbnails {
+        gap: 8px;
+        margin-inline: 0;
+        padding-inline: 0;
+        padding-block: 0;
+      }
+
+      .media-gallery__mobile-controls[thumbnails] .slideshow-controls__thumbnail {
+        width: 70px;
+        height: 70px;
+        aspect-ratio: 1 / 1;
+        flex-shrink: 0;
+        /* Reserve border space so selection doesn't shift layout; outline is clipped by overflow */
+        border: 1px solid transparent;
+        outline: none;
+
+        &:is([aria-selected='true']) {
+          outline: none;
+          border-color: var(--color-foreground);
+        }
+      }
     }
   }
 

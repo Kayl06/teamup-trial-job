@@ -41,6 +41,21 @@
       grid-template-columns: repeat(2, 1fr);
     }
 
+    .media-gallery--featured-column .media-gallery__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .media-gallery--featured-column .media-gallery__grid .product-media-container:first-child {
+      grid-column: span 2;
+      --gallery-aspect-ratio: 1 / 1;
+      --media-preview-ratio: 1 / 1;
+    }
+
+    .media-gallery--featured-column .media-gallery__grid .product-media-container:not(:first-child) {
+      --gallery-aspect-ratio: 1 / 1;
+      --media-preview-ratio: 1 / 1;
+    }
+
     /* Display grid view as a carousel on mobile, grid on desktop */
     media-gallery:is(.media-gallery--grid) slideshow-component {
       display: none;
