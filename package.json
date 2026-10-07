@@ -1,11 +1,11 @@
 {
     "scripts": {
-      "auth": "shopify auth login --store teamup-trial-job.myshopify.com",
-      "dev": "shopify theme dev --store teamup-trial-job.myshopify.com",
-      "pull": "shopify theme pull --store teamup-trial-job.myshopify.com",
-      "pull:dev": "shopify theme pull --development --store teamup-trial-job.myshopify.com",
-      "push": "shopify theme push --store teamup-trial-job.myshopify.com",
-      "list": "shopify theme list --store teamup-trial-job.myshopify.com",
+      "auth": "shopify auth login",
+      "dev": "shopify theme dev",
+      "pull": "shopify theme pull",
+      "pull:dev": "shopify theme pull --development",
+      "push": "shopify theme push",
+      "list": "shopify theme list",
       "check": "shopify theme check"
     }
   }
