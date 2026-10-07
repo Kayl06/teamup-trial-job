@@ -1,0 +1,31 @@
+<h1 class="product-details-title" {{ block.shopify_attributes }}>{{ closest.product.title }}</h1>
+
+{% stylesheet %}
+  .product-details-title {
+    margin: 0;
+    color: #251f1a;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: normal;
+  }
+
+  @media screen and (max-width: 749px) {
+    .product-details-title {
+      font-size: 22px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:names.title",
+  "tag": null,
+  "settings": [],
+  "presets": [
+    {
+      "name": "t:names.title"
+    }
+  ]
+}
+{% endschema %}

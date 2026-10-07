@@ -1,0 +1,95 @@
+<details class="accordion-section__row" {{ block.shopify_attributes }}>
+  <summary class="accordion-section__summary">
+    <span>{{ block.settings.heading }}</span>
+    <svg class="accordion-section__plus icon-plus" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+      <path class="vertical" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" d="M3 8h10"/>
+      <path class="horizontal" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" d="M8 3v10"/>
+    </svg>
+  </summary>
+  <div class="accordion-section__body">{{ block.settings.content }}</div>
+</details>
+
+{% stylesheet %}
+  .accordion-section__row {
+    margin: 0;
+    border-bottom: 1px solid #e8e8e0;
+    color: #251f1a;
+  }
+
+  .accordion-section__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 0;
+    color: #251f1a;
+    font-family: inherit;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    list-style: none;
+    cursor: pointer;
+    padding-left: 12px;
+  }
+
+  .accordion-section__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .accordion-section__plus {
+    display: block;
+    flex: 0 0 auto;
+  }
+
+  .accordion-section__body {
+    padding: 0 0 14px 12px;
+    color: #251f1a;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.4;
+    letter-spacing: normal;
+    text-transform: none;
+  }
+
+  .accordion-section__body > * {
+    margin: 0;
+  }
+
+  .accordion-section__body > * + * {
+    margin-top: 8px;
+  }
+{% endstylesheet %}
+
+{% render 'summary-icon-styles' %}
+
+{% schema %}
+{
+  "name": "t:names.accordion_row",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:settings.heading",
+      "default": "What it does"
+    },
+    {
+      "type": "richtext",
+      "id": "content",
+      "label": "Content",
+      "default": "<p>It softens hair and helps protect colour from chlorine and salt water.</p>"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.accordion_row",
+      "settings": {
+        "heading": "What it does",
+        "content": "<p>It softens hair and helps protect colour from chlorine and salt water.</p>"
+      }
+    }
+  ]
+}
+{% endschema %}

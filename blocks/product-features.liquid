@@ -1,0 +1,94 @@
+<div class="product-features" {{ block.shopify_attributes }}>
+  {% content_for 'blocks' %}
+</div>
+
+{% stylesheet %}
+  .product-features {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    width: 100%;
+  }
+
+  @media screen and (max-width: 749px) {
+    .product-features {
+      gap: 20px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:names.product_features",
+  "tag": null,
+  "blocks": [
+    {
+      "type": "feature-list"
+    },
+    {
+      "type": "purchase-options"
+    }
+  ],
+  "settings": [],
+  "presets": [
+    {
+      "name": "t:names.product_features",
+      "blocks": {
+        "feature-list": {
+          "type": "feature-list",
+          "blocks": {
+            "feature-1": {
+              "type": "feature-item",
+              "settings": {
+                "text": "Softer, smoother hair from the first use"
+              }
+            },
+            "feature-2": {
+              "type": "feature-item",
+              "settings": {
+                "text": "Makes hair easier to brush after swimming"
+              }
+            },
+            "feature-3": {
+              "type": "feature-item",
+              "settings": {
+                "text": "Colour-safe: protects against chlorine & saltwater fade"
+              }
+            }
+          },
+          "block_order": ["feature-1", "feature-2", "feature-3"]
+        },
+        "purchase": {
+          "type": "purchase-options",
+          "settings": {
+            "default_tier": "2",
+            "tier_1_quantity": 1,
+            "tier_1_discount": 0,
+            "tier_1_label": "Buy 1",
+            "tier_2_quantity": 2,
+            "tier_2_discount": 15,
+            "tier_2_badge": "Most popular",
+            "tier_2_shipping": "+ FREE SHIPPING",
+            "tier_2_label": "Buy 2",
+            "tier_3_quantity": 3,
+            "tier_3_discount": 20,
+            "tier_3_badge": "Best value",
+            "tier_3_shipping": "+ FREE SHIPPING",
+            "tier_3_label": "Buy 3"
+          },
+          "blocks": {
+            "guarantee": {
+              "type": "guarantee-container",
+              "settings": {
+                "text": "We back it. 30 days, money back guarantee."
+              }
+            }
+          },
+          "block_order": ["guarantee"]
+        }
+      },
+      "block_order": ["feature-list", "purchase"]
+    }
+  ]
+}
+{% endschema %}

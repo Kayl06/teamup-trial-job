@@ -1,0 +1,51 @@
+<div class="feature-list" {{ block.shopify_attributes }}>
+  {% content_for 'blocks' %}
+</div>
+
+{% stylesheet %}
+  .feature-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:names.feature_list",
+  "tag": null,
+  "blocks": [
+    {
+      "type": "feature-item"
+    }
+  ],
+  "settings": [],
+  "presets": [
+    {
+      "name": "t:names.feature_list",
+      "blocks": {
+        "feature-1": {
+          "type": "feature-item",
+          "settings": {
+            "text": "Softer, smoother hair from the first use"
+          }
+        },
+        "feature-2": {
+          "type": "feature-item",
+          "settings": {
+            "text": "Makes hair easier to brush after swimming"
+          }
+        },
+        "feature-3": {
+          "type": "feature-item",
+          "settings": {
+            "text": "Colour-safe: protects against chlorine & saltwater fade"
+          }
+        }
+      },
+      "block_order": ["feature-1", "feature-2", "feature-3"]
+    }
+  ]
+}
+{% endschema %}

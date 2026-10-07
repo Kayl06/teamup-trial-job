@@ -1,0 +1,44 @@
+{%- unless block.settings.text == blank -%}
+  <span class="detail-item" {{ block.shopify_attributes }}>{{ block.settings.text }}</span>
+{%- endunless -%}
+
+{% stylesheet %}
+  .detail-item {
+    display: inline;
+    margin: 0;
+    color: #251f1a;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.45;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .detail-item:not(:first-child)::before {
+    content: ' • ';
+    padding: 5px;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:names.detail_item",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "text",
+      "label": "t:settings.text",
+      "default": "ALL HAIR TYPES"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.detail_item",
+      "settings": {
+        "text": "ALL HAIR TYPES"
+      }
+    }
+  ]
+}
+{% endschema %}

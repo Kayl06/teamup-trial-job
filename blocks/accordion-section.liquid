@@ -1,0 +1,111 @@
+<div class="accordion-section" {{ block.shopify_attributes }}>
+  {% content_for 'blocks' %}
+</div>
+
+{% stylesheet %}
+  .accordion-section {
+    width: 100%;
+    border-top: 1px solid #e8e8e0;
+
+    details {
+      &::details-content,
+      .accordion-section__body {
+        block-size: 0;
+        overflow-y: clip;
+        opacity: 0;
+        interpolate-size: allow-keywords;
+        transition: content-visibility var(--animation-speed-slow) allow-discrete,
+          padding-block var(--animation-speed-slow) var(--animation-easing),
+          opacity var(--animation-speed-slow) var(--animation-easing),
+          block-size var(--animation-speed-slow) var(--animation-easing);
+      }
+
+      /* Skip the transition unless the shopper opened or closed the row. */
+      &:not(:focus-within)::details-content,
+      &:not(:focus-within) .accordion-section__body {
+        transition: none;
+      }
+
+      &:not([open]) {
+        &::details-content,
+        .accordion-section__body {
+          padding-block: 0;
+        }
+      }
+
+      &[open] {
+        &::details-content,
+        .accordion-section__body {
+          opacity: 1;
+          block-size: auto;
+
+          @starting-style {
+            block-size: 0;
+            opacity: 0;
+            overflow-y: clip;
+          }
+
+          &:focus-within {
+            overflow-y: visible;
+          }
+        }
+      }
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:names.accordion_section",
+  "tag": null,
+  "blocks": [
+    {
+      "type": "accordion-row"
+    }
+  ],
+  "settings": [],
+  "presets": [
+    {
+      "name": "t:names.accordion_section",
+      "blocks": {
+        "row-1": {
+          "type": "accordion-row",
+          "settings": {
+            "heading": "What it does",
+            "content": "<p>It softens hair and helps protect colour from chlorine and salt water.</p>"
+          }
+        },
+        "row-2": {
+          "type": "accordion-row",
+          "settings": {
+            "heading": "Why it works",
+            "content": "<p>A light conditioning film stays on the hair without weighing it down.</p>"
+          }
+        },
+        "row-3": {
+          "type": "accordion-row",
+          "settings": {
+            "heading": "How to use",
+            "content": "<p>Work a small amount through damp hair before swimming, then style as usual.</p>"
+          }
+        },
+        "row-4": {
+          "type": "accordion-row",
+          "settings": {
+            "heading": "Ingredients",
+            "content": "<p>Plant oils and conditioning agents, with no drying alcohols.</p>"
+          }
+        },
+        "row-5": {
+          "type": "accordion-row",
+          "settings": {
+            "heading": "Shipping & returns AU",
+            "content": "<p>Free shipping on Australian orders over $50, and 30 days to change your mind.</p>"
+          }
+        }
+      },
+      "block_order": ["row-1", "row-2", "row-3", "row-4", "row-5"]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,98 @@
+<div class="trust-item" {{ block.shopify_attributes }}>
+  <span class="trust-item__icon" aria-hidden="true">
+    {% liquid
+      case block.settings.icon
+        when 'vegan', 'leaf'
+          assign icon_file = 'icon-trust-vegan.png'
+        when 'australia'
+          assign icon_file = 'icon-trust-australia.png'
+        else
+          assign icon_file = 'icon-trust-shipping.png'
+      endcase
+    %}
+    <img src="{{ icon_file | asset_url }}" alt="" width="24" height="24">
+  </span>
+  <span class="trust-item__label">{{ block.settings.label | newline_to_br }}</span>
+</div>
+
+{% stylesheet %}
+  .trust-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    margin: 0;
+    color: #251f1a;
+    font-size: 12px;
+    line-height: 1.3;
+    text-align: center;
+  }
+
+  .trust-item__icon {
+    display: flex;
+    color: #251f1a;
+  }
+
+  .trust-item__icon img {
+    display: block;
+    width: 24px;
+    height: 24px;
+  }
+
+  .trust-item__label {
+    overflow-wrap: break-word;
+    font-size: 16px;
+    line-height: 1.25;
+  }
+
+  @media screen and (max-width: 749px) {
+    .trust-item__label {
+      font-size: 12px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:names.trust_item",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "label",
+      "label": "t:settings.label",
+      "default": "Free Shipping\n$50+"
+    },
+    {
+      "type": "select",
+      "id": "icon",
+      "label": "t:settings.icon",
+      "options": [
+        {
+          "value": "shipping",
+          "label": "Shipping"
+        },
+        {
+          "value": "vegan",
+          "label": "Vegan"
+        },
+        {
+          "value": "australia",
+          "label": "Australia"
+        }
+      ],
+      "default": "shipping"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.trust_item",
+      "settings": {
+        "label": "Free Shipping\n$50+",
+        "icon": "shipping"
+      }
+    }
+  ]
+}
+{% endschema %}

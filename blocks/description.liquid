@@ -1,0 +1,31 @@
+{% liquid
+  assign description = closest.product.description | strip_html | strip
+%}
+
+{% if description != blank or request.design_mode %}
+  <p class="product-details-description" {{ block.shopify_attributes }}>{{ description }}</p>
+{% endif %}
+
+{% stylesheet %}
+  .product-details-description {
+    margin: 0;
+    color: #251f1a;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.4;
+    letter-spacing: normal;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:names.description",
+  "tag": null,
+  "settings": [],
+  "presets": [
+    {
+      "name": "t:names.description"
+    }
+  ]
+}
+{% endschema %}

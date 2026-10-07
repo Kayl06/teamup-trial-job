@@ -1,0 +1,386 @@
+{% comment %}
+  Storefront videos come from product metafield custom.videos, a list of metaobject references.
+  Metaobject type handle product_video with fields:
+  - video (file) with optional video_url (url) fallback
+  - poster (image) with optional poster_url (url) fallback
+  Create that in Shopify admin; the theme does not create the definition.
+{% endcomment %}
+
+{% liquid
+  assign video_list = closest.product.metafields.custom.videos.value
+%}
+
+<product-videos class="product-videos" {{ block.shopify_attributes }}>
+  <div class="product-videos__carousel">
+    <div class="product-videos__row">
+      {% if video_list != blank and video_list.size > 0 %}
+        {% for item in video_list %}
+          {% liquid
+            assign video_file = item.video.value
+            assign poster_image = item.poster.value
+            assign poster_src = blank
+            if poster_image == blank and video_file.preview_image != blank
+              assign poster_image = video_file.preview_image
+            endif
+            if poster_image != blank
+              assign poster_src = poster_image | image_url: width: 800
+            elsif item.poster_url.value != blank
+              assign poster_src = item.poster_url.value
+            endif
+            assign source_url = blank
+            if video_file.sources != blank
+              for source in video_file.sources
+                if source.mime_type contains 'mp4' or source.format == 'mp4'
+                  assign source_url = source.url
+                  break
+                endif
+              endfor
+              if source_url == blank
+                assign source_url = video_file.sources.first.url
+              endif
+            elsif video_file.url != blank
+              assign source_url = video_file.url
+            elsif item.video_url.value != blank
+              assign source_url = item.video_url.value
+            endif
+          %}
+          {% if source_url != blank %}
+            <button
+              type="button"
+              class="product-videos__open"
+              data-video-src="{{ source_url | escape }}"
+              {% if poster_src != blank %}
+                data-poster="{{ poster_src | escape }}"
+              {% endif %}
+              aria-label="Play video"
+            >
+              {% if poster_src != blank %}
+                <img
+                  class="product-videos__poster"
+                  src="{{ poster_src | escape }}"
+                  alt=""
+                  width="800"
+                  height="1067"
+                  loading="lazy"
+                >
+              {% endif %}
+              <span class="product-videos__play" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="36" height="36">
+                  <circle cx="12" cy="12" r="11" fill="#fffff4"/>
+                  <path d="M10 8.2l6.2 3.8L10 15.8z" fill="#251f1a"/>
+                </svg>
+              </span>
+            </button>
+          {% else %}
+            <div class="product-videos__frame" aria-hidden="true">
+              <span class="product-videos__play">
+                <svg viewBox="0 0 24 24" width="36" height="36">
+                  <circle cx="12" cy="12" r="11" fill="#fffff4"/>
+                  <path d="M10 8.2l6.2 3.8L10 15.8z" fill="#251f1a"/>
+                </svg>
+              </span>
+            </div>
+          {% endif %}
+        {% endfor %}
+      {% else %}
+        {% for index in (1..4) %}
+          <div class="product-videos__frame" aria-hidden="true">
+            <span class="product-videos__play">
+              <svg viewBox="0 0 24 24" width="36" height="36">
+                <circle cx="12" cy="12" r="11" fill="#fffff4"/>
+                <path d="M10 8.2l6.2 3.8L10 15.8z" fill="#251f1a"/>
+              </svg>
+            </span>
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+    <button
+      type="button"
+      class="product-videos__nav product-videos__nav--prev"
+      data-video-prev
+      aria-label="Previous videos"
+      hidden
+    >
+      <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+        <path d="M10 3L5 8l5 5" fill="none" stroke="#251f1a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <button
+      type="button"
+      class="product-videos__nav product-videos__nav--next"
+      data-video-next
+      aria-label="Next videos"
+      hidden
+    >
+      <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+        <path d="M6 3l5 5-5 5" fill="none" stroke="#251f1a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+  <dialog class="product-videos__dialog" aria-label="Product video">
+    <button type="button" class="product-videos__close" data-video-close>Close</button>
+    <video controls playsinline preload="none"></video>
+  </dialog>
+</product-videos>
+
+{% stylesheet %}
+  .product-videos {
+    --product-videos-gap: 8px;
+    /* Desktop: 3 full slides + 30% of the next */
+    --product-videos-slides: 3.3;
+    --product-videos-gaps-in-view: 3;
+
+    display: block;
+    width: 100%;
+  }
+
+  @media screen and (max-width: 749px) {
+    .product-videos {
+      /* Mobile: 2 full slides + 30% of the next */
+      --product-videos-slides: 2.3;
+      --product-videos-gaps-in-view: 2;
+    }
+  }
+
+  .product-videos__carousel {
+    position: relative;
+    width: 100%;
+  }
+
+  .product-videos__row {
+    display: flex;
+    gap: var(--product-videos-gap);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+  }
+
+  .product-videos__row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .product-videos__open,
+  .product-videos__frame {
+    position: relative;
+    display: block;
+    flex: 0 0 calc(
+      (100% - (var(--product-videos-gap) * var(--product-videos-gaps-in-view))) /
+        var(--product-videos-slides)
+    );
+    width: calc(
+      (100% - (var(--product-videos-gap) * var(--product-videos-gaps-in-view))) /
+        var(--product-videos-slides)
+    );
+    aspect-ratio: 186 / 317;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    border-radius: 2px;
+    background: #f0d8c8;
+    scroll-snap-align: start;
+  }
+
+  .product-videos__open {
+    cursor: pointer;
+  }
+
+  .product-videos__poster {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .product-videos__play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: flex;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .product-videos__nav {
+    position: absolute;
+    top: 50%;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 2px 8px rgb(37 31 26 / 0.18);
+    cursor: pointer;
+  }
+
+  .product-videos__nav[hidden] {
+    display: none;
+  }
+
+  .product-videos__nav--prev {
+    left: 0;
+    transform: translate(-50%, -50%);
+  }
+
+  .product-videos__nav--next {
+    right: 0;
+    transform: translate(50%, -50%);
+  }
+
+  .product-videos__nav:focus-visible {
+    outline: 2px solid #251f1a;
+    outline-offset: 2px;
+  }
+
+  .product-videos__dialog {
+    width: min(28rem, calc(100vw - 2rem));
+    max-width: calc(100vw - 2rem);
+    padding: 0;
+    border: 0;
+    background: #251f1a;
+  }
+
+  .product-videos__dialog::backdrop {
+    background: rgb(37 31 26 / 0.72);
+  }
+
+  .product-videos__dialog video {
+    display: block;
+    width: 100%;
+    max-height: 80vh;
+    background: #251f1a;
+  }
+
+  .product-videos__close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 1;
+    margin: 0;
+    padding: 4px 8px;
+    border: 0;
+    border-radius: 2px;
+    background: #fffff4;
+    color: #251f1a;
+    font-family: inherit;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .product-videos__open:focus-visible,
+  .product-videos__close:focus-visible {
+    outline: 2px solid #251f1a;
+    outline-offset: 2px;
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class ProductVideos extends HTMLElement {
+    #resizeObserver;
+
+    connectedCallback() {
+      if (this.dataset.bound === 'true') return;
+      this.dataset.bound = 'true';
+      this.dialog = this.querySelector('dialog');
+      this.player = this.querySelector('video');
+      this.scroller = this.querySelector('.product-videos__row');
+      this.prevButton = this.querySelector('[data-video-prev]');
+      this.nextButton = this.querySelector('[data-video-next]');
+
+      this.addEventListener('click', (event) => {
+        if (event.target.closest('[data-video-prev]')) {
+          this.#scrollBySlide(-1);
+          return;
+        }
+        if (event.target.closest('[data-video-next]')) {
+          this.#scrollBySlide(1);
+          return;
+        }
+
+        const opener = event.target.closest('[data-video-src]');
+        if (opener && this.dialog && this.player) {
+          this.player.src = opener.dataset.videoSrc;
+          if (opener.dataset.poster) {
+            this.player.poster = opener.dataset.poster;
+          } else {
+            this.player.removeAttribute('poster');
+          }
+          this.dialog.showModal();
+          const playback = this.player.play();
+          if (playback) playback.catch(() => {});
+          return;
+        }
+        if (event.target.closest('[data-video-close]')) {
+          this.dialog?.close();
+        }
+      });
+
+      this.dialog?.addEventListener('close', () => {
+        if (!this.player) return;
+        this.player.pause();
+        this.player.removeAttribute('src');
+        this.player.load();
+      });
+
+      this.dialog?.addEventListener('click', (event) => {
+        if (event.target === this.dialog) this.dialog.close();
+      });
+
+      this.scroller?.addEventListener('scroll', () => this.#updateNav(), { passive: true });
+      this.#resizeObserver = new ResizeObserver(() => this.#updateNav());
+      if (this.scroller) this.#resizeObserver.observe(this.scroller);
+      this.#updateNav();
+    }
+
+    #scrollBySlide(direction) {
+      if (!this.scroller) return;
+      const slide = this.scroller.querySelector('.product-videos__open, .product-videos__frame');
+      if (!slide) return;
+      const gap = parseFloat(getComputedStyle(this.scroller).gap) || 0;
+      const amount = (slide.getBoundingClientRect().width + gap) * direction;
+      this.scroller.scrollBy({ left: amount, behavior: 'smooth' });
+    }
+
+    #updateNav() {
+      if (!this.scroller || !this.prevButton || !this.nextButton) return;
+      const maxScroll = this.scroller.scrollWidth - this.scroller.clientWidth;
+      const canScroll = maxScroll > 1;
+      const atStart = this.scroller.scrollLeft <= 1;
+      const atEnd = this.scroller.scrollLeft >= maxScroll - 1;
+
+      this.prevButton.hidden = !canScroll || atStart;
+      this.nextButton.hidden = !canScroll || atEnd;
+    }
+  }
+
+  if (!customElements.get('product-videos')) {
+    customElements.define('product-videos', ProductVideos);
+  }
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "t:names.product_videos",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Videos load from the product metafield custom.videos, a list of product_video metaobjects. Prefer video + poster file fields; video_url and poster_url are optional URL fallbacks. Create that definition in Shopify admin."
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.product_videos"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,57 @@
+<div class="feature-item" {{ block.shopify_attributes }}>
+  <svg class="feature-item__icon" viewBox="0 0 20 20" width="20" height="20" aria-hidden="true">
+    <circle cx="10" cy="10" r="7.25" fill="none" stroke="currentColor" stroke-width="1.5"/>
+    <path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M6.5 10.35 8.2 12.2 12.3 7.35"/>
+  </svg>
+  <span class="feature-item__text">{{ block.settings.text }}</span>
+</div>
+
+{% stylesheet %}
+  .feature-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    width: 100%;
+    margin: 0;
+    color: #251f1a;
+    font-size: 18px;
+    line-height: 1.4;
+  }
+
+  .feature-item__icon {
+    display: block;
+    flex: 0 0 auto;
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+  }
+
+  @media screen and (max-width: 749px) {
+    .feature-item {
+      font-size: 15px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:names.feature_item",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "text",
+      "label": "t:settings.text",
+      "default": "Softer, smoother hair from the first use"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.feature_item",
+      "settings": {
+        "text": "Softer, smoother hair from the first use"
+      }
+    }
+  ]
+}
+{% endschema %}

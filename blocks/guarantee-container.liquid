@@ -1,0 +1,59 @@
+<div class="guarantee-container" {{ block.shopify_attributes }}>
+  <img
+    class="guarantee-container__icon"
+    src="{{ 'icon-guarantee.png' | asset_url }}"
+    alt=""
+    width="24"
+    height="24"
+  >
+  <p class="guarantee-container__text">{{ block.settings.text }}</p>
+</div>
+
+{% stylesheet %}
+  .guarantee-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    margin: 0;
+    color: #251f1a;
+    font-size: 16px;
+    line-height: 1.3;
+    text-align: center;
+  }
+
+  .guarantee-container__icon {
+    display: block;
+    flex: 0 0 auto;
+    width: 24px;
+    height: 24px;
+  }
+
+  .guarantee-container__text {
+    margin: 0;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:names.guarantee_container",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "text",
+      "label": "t:settings.text",
+      "default": "We back it. 30 days, money back guarantee."
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.guarantee_container",
+      "settings": {
+        "text": "We back it. 30 days, money back guarantee."
+      }
+    }
+  ]
+}
+{% endschema %}

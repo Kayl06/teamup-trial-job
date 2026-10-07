@@ -1,0 +1,59 @@
+<div class="product-details-header" {{ block.shopify_attributes }}>
+  {% content_for 'blocks' %}
+</div>
+
+{% stylesheet %}
+  .product-details-header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    width: 100%;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:names.header",
+  "tag": null,
+  "blocks": [
+    {
+      "type": "rating"
+    },
+    {
+      "type": "title"
+    },
+    {
+      "type": "description"
+    },
+    {
+      "type": "price-container"
+    }
+  ],
+  "settings": [],
+  "presets": [
+    {
+      "name": "t:names.header",
+      "blocks": {
+        "rating": {
+          "type": "rating",
+          "settings": {
+            "rating": 5,
+            "count_label": "(2,002)"
+          }
+        },
+        "title": {
+          "type": "title"
+        },
+        "description": {
+          "type": "description"
+        },
+        "price": {
+          "type": "price-container"
+        }
+      },
+      "block_order": ["rating", "title", "description", "price"]
+    }
+  ]
+}
+{% endschema %}

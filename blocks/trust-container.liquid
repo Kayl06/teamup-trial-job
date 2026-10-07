@@ -1,0 +1,54 @@
+<div class="trust-container" {{ block.shopify_attributes }}>
+  {% content_for 'blocks' %}
+</div>
+
+{% stylesheet %}
+  .trust-container {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:names.trust_container",
+  "tag": null,
+  "blocks": [
+    {
+      "type": "trust-item"
+    }
+  ],
+  "settings": [],
+  "presets": [
+    {
+      "name": "t:names.trust_container",
+      "blocks": {
+        "trust-1": {
+          "type": "trust-item",
+          "settings": {
+            "label": "Free Shipping\n$50+",
+            "icon": "shipping"
+          }
+        },
+        "trust-2": {
+          "type": "trust-item",
+          "settings": {
+            "label": "Vegan &\nCruelty Free",
+            "icon": "vegan"
+          }
+        },
+        "trust-3": {
+          "type": "trust-item",
+          "settings": {
+            "label": "Australian\nMade",
+            "icon": "australia"
+          }
+        }
+      },
+      "block_order": ["trust-1", "trust-2", "trust-3"]
+    }
+  ]
+}
+{% endschema %}

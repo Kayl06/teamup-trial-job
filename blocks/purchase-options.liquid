@@ -1,0 +1,476 @@
+{% liquid
+  assign product = closest.product
+  if request.visual_preview_mode and product == blank
+    assign product = collections.all.products.first
+  endif
+  assign variant = product.selected_or_first_available_variant
+  assign unit_price = variant.price | default: 0
+  assign selected_tier = block.settings.default_tier | default: '2'
+  case selected_tier
+    when '1'
+      assign selected_qty = block.settings.tier_1_quantity | default: 1
+      assign selected_discount = block.settings.tier_1_discount | default: 0
+    when '3'
+      assign selected_qty = block.settings.tier_3_quantity | default: 3
+      assign selected_discount = block.settings.tier_3_discount | default: 20
+    else
+      assign selected_qty = block.settings.tier_2_quantity | default: 2
+      assign selected_discount = block.settings.tier_2_discount | default: 15
+  endcase
+  if selected_qty < 1
+    assign selected_qty = 1
+  endif
+  if selected_discount < 0
+    assign selected_discount = 0
+  endif
+  if selected_discount > 100
+    assign selected_discount = 100
+  endif
+  assign selected_factor = 100 | minus: selected_discount
+  assign selected_sale = unit_price | times: selected_qty | times: selected_factor | divided_by: 100
+  assign selected_sale_money = selected_sale | money | strip_html | strip
+%}
+
+<purchase-options class="purchase-options" {{ block.shopify_attributes }}>
+  {% if product != blank and variant != blank %}
+    {% form 'product', product, class: 'purchase-options__form' %}
+      <input type="hidden" name="id" value="{{ variant.id }}">
+      <div class="purchase-options__cards">
+        {% for index in (1..3) %}
+          {% liquid
+            case index
+              when 1
+                assign qty = block.settings.tier_1_quantity | default: 1
+                assign discount = block.settings.tier_1_discount | default: 0
+                assign shipping = block.settings.tier_1_shipping
+                assign label = block.settings.tier_1_label | default: 'Buy 1'
+              when 2
+                assign qty = block.settings.tier_2_quantity | default: 2
+                assign discount = block.settings.tier_2_discount | default: 15
+                assign shipping = block.settings.tier_2_shipping
+                assign label = block.settings.tier_2_label | default: 'Buy 2'
+              else
+                assign qty = block.settings.tier_3_quantity | default: 3
+                assign discount = block.settings.tier_3_discount | default: 20
+                assign shipping = block.settings.tier_3_shipping
+                assign label = block.settings.tier_3_label | default: 'Buy 3'
+            endcase
+
+            if qty < 1
+              assign qty = 1
+            endif
+            if discount < 0
+              assign discount = 0
+            endif
+            if discount > 100
+              assign discount = 100
+            endif
+
+            assign factor = 100 | minus: discount
+            assign sale_cents = unit_price | times: qty | times: factor | divided_by: 100
+            assign compare_cents = unit_price | times: qty
+            assign tier_key = index | append: ''
+            assign sale_money = sale_cents | money | strip_html | strip
+            if discount > 0
+              assign sale_display = sale_cents | money
+            else
+              assign sale_display = sale_cents | money_without_trailing_zeros | append: ' ' | append: cart.currency.iso_code
+            endif
+            if selected_tier == tier_key
+              assign selected_qty = qty
+              assign selected_sale = sale_cents
+            endif
+          %}
+          <button
+            type="button"
+            class="purchase-options__tier{% if selected_tier == tier_key %} is-selected{% endif %}"
+            data-tier="{{ tier_key }}"
+            data-quantity="{{ qty }}"
+            data-sale="{{ sale_money | escape }}"
+            aria-pressed="{% if selected_tier == tier_key %}true{% else %}false{% endif %}"
+          >
+            {% if discount > 0 %}
+              <span class="purchase-options__tier__badge">SAVE {{ discount }}%</span>
+            {% endif %}
+            <span class="purchase-options__tier__label">{{ label }}</span>
+            <span class="purchase-options__tier__prices">
+              <span class="purchase-options__tier__sale">{{ sale_display }}</span>
+              {% if discount > 0 %}
+                <s class="purchase-options__tier__compare">{{ compare_cents | money }}</s>
+              {% endif %}
+            </span>
+            {% if shipping != blank %}
+              <span class="purchase-options__tier__shipping">{{ shipping }}</span>
+            {% endif %}
+          </button>
+        {% endfor %}
+      </div>
+      <input type="hidden" name="quantity" value="{{ selected_qty }}">
+      <button
+        type="submit"
+        class="purchase-options__atc"
+        {% unless variant.available %}
+          disabled
+        {% endunless %}
+      >
+        <span data-add-label>ADD TO CART - {{ selected_sale_money }}</span>
+      </button>
+    {% endform %}
+  {% endif %}
+  {% content_for 'blocks' %}
+</purchase-options>
+
+{% stylesheet %}
+  .purchase-options {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+  }
+
+  .purchase-options__form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+  }
+
+  .purchase-options__cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 13px;
+    padding-top: 12px;
+  }
+
+  .purchase-options__tier {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+    margin: 0;
+    padding: 26px 8px 16px;
+    border: 1px solid #bd9d80;
+    border-radius: 4px;
+    background: transparent;
+    color: #251f1a;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.2;
+    text-align: center;
+    cursor: pointer;
+  }
+
+  .purchase-options__tier.is-selected {
+    background: #F2DECA;
+    border-color: #bd9d80;
+  }
+
+  .purchase-options__tier__badge {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: #bd9d80;
+    color: #fffff4;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .purchase-options__tier__label,
+  .purchase-options__tier__sale {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .purchase-options__tier__prices {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+  }
+
+  .purchase-options__tier__compare {
+    font-size: 18px;
+    font-weight: 400;
+  }
+
+  .purchase-options__tier__shipping {
+    margin-top: 0;
+    color: #251f1a;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+    opacity: 0.72;
+  }
+
+  .purchase-options__atc {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 48px;
+    margin: 0;
+    padding: 0 12px;
+    border: 0;
+    border-radius: 8px;
+    background: #886848;
+    color: #fffff4;
+    font-family: inherit;
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    line-height: 1;
+    text-transform: uppercase;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .purchase-options__atc:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+
+  .purchase-options__tier:focus-visible,
+  .purchase-options__atc:focus-visible {
+    outline: 2px solid #251f1a;
+    outline-offset: 2px;
+  }
+
+  @media screen and (max-width: 749px) {
+    .purchase-options__cards {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      padding-top: 14px;
+    }
+
+    .purchase-options__tier {
+      gap: 4px;
+      padding: 22px 4px 12px;
+      font-size: 12px;
+    }
+
+    .purchase-options__tier__badge {
+      padding: 4px 7px;
+      font-size: 9px;
+      letter-spacing: 0.02em;
+    }
+
+    .purchase-options__tier__label,
+    .purchase-options__tier__sale,
+    .purchase-options__tier__compare {
+      font-size: 13px;
+    }
+
+    .purchase-options__tier__shipping {
+      font-size: 9px;
+    }
+
+    .purchase-options__atc {
+      font-size: 14px;
+      letter-spacing: 0.04em;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class PurchaseOptions extends HTMLElement {
+    connectedCallback() {
+      if (this.dataset.bound === 'true') return;
+      this.dataset.bound = 'true';
+      this.addEventListener('click', (event) => {
+        const card = event.target.closest('[data-tier]');
+        if (!card || !this.contains(card)) return;
+        this.selectTier(card);
+      });
+    }
+
+    selectTier(card) {
+      this.querySelectorAll('[data-tier]').forEach((item) => {
+        const selected = item === card;
+        item.classList.toggle('is-selected', selected);
+        item.setAttribute('aria-pressed', selected ? 'true' : 'false');
+      });
+      const quantity = this.querySelector('input[name="quantity"]');
+      if (quantity) quantity.value = card.dataset.quantity;
+      const label = this.querySelector('[data-add-label]');
+      if (label) label.textContent = `ADD TO CART - ${card.dataset.sale}`;
+    }
+  }
+
+  if (!customElements.get('purchase-options')) {
+    customElements.define('purchase-options', PurchaseOptions);
+  }
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "t:names.purchase_options",
+  "tag": null,
+  "blocks": [
+    {
+      "type": "guarantee-container"
+    }
+  ],
+  "settings": [
+    {
+      "type": "select",
+      "id": "default_tier",
+      "label": "Selected tier",
+      "options": [
+        { "value": "1", "label": "Tier 1" },
+        { "value": "2", "label": "Tier 2" },
+        { "value": "3", "label": "Tier 3" }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "header",
+      "content": "Tier 1"
+    },
+    {
+      "type": "number",
+      "id": "tier_1_quantity",
+      "label": "Quantity",
+      "default": 1
+    },
+    {
+      "type": "number",
+      "id": "tier_1_discount",
+      "label": "Discount percent",
+      "default": 0
+    },
+    {
+      "type": "text",
+      "id": "tier_1_badge",
+      "label": "Badge"
+    },
+    {
+      "type": "text",
+      "id": "tier_1_shipping",
+      "label": "Shipping"
+    },
+    {
+      "type": "text",
+      "id": "tier_1_label",
+      "label": "t:settings.label",
+      "default": "Buy 1"
+    },
+    {
+      "type": "header",
+      "content": "Tier 2"
+    },
+    {
+      "type": "number",
+      "id": "tier_2_quantity",
+      "label": "Quantity",
+      "default": 2
+    },
+    {
+      "type": "number",
+      "id": "tier_2_discount",
+      "label": "Discount percent",
+      "default": 15
+    },
+    {
+      "type": "text",
+      "id": "tier_2_badge",
+      "label": "Badge",
+      "default": "Most popular"
+    },
+    {
+      "type": "text",
+      "id": "tier_2_shipping",
+      "label": "Shipping",
+      "default": "+ FREE SHIPPING"
+    },
+    {
+      "type": "text",
+      "id": "tier_2_label",
+      "label": "t:settings.label",
+      "default": "Buy 2"
+    },
+    {
+      "type": "header",
+      "content": "Tier 3"
+    },
+    {
+      "type": "number",
+      "id": "tier_3_quantity",
+      "label": "Quantity",
+      "default": 3
+    },
+    {
+      "type": "number",
+      "id": "tier_3_discount",
+      "label": "Discount percent",
+      "default": 20
+    },
+    {
+      "type": "text",
+      "id": "tier_3_badge",
+      "label": "Badge",
+      "default": "Best value"
+    },
+    {
+      "type": "text",
+      "id": "tier_3_shipping",
+      "label": "Shipping",
+      "default": "+ FREE SHIPPING"
+    },
+    {
+      "type": "text",
+      "id": "tier_3_label",
+      "label": "t:settings.label",
+      "default": "Buy 3"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.purchase_options",
+      "settings": {
+        "default_tier": "2",
+        "tier_1_quantity": 1,
+        "tier_1_discount": 0,
+        "tier_1_badge": "",
+        "tier_1_shipping": "",
+        "tier_1_label": "Buy 1",
+        "tier_2_quantity": 2,
+        "tier_2_discount": 15,
+        "tier_2_badge": "Most popular",
+        "tier_2_shipping": "+ FREE SHIPPING",
+        "tier_2_label": "Buy 2",
+        "tier_3_quantity": 3,
+        "tier_3_discount": 20,
+        "tier_3_badge": "Best value",
+        "tier_3_shipping": "+ FREE SHIPPING",
+        "tier_3_label": "Buy 3"
+      },
+      "blocks": {
+        "guarantee": {
+          "type": "guarantee-container",
+          "settings": {
+            "text": "We back it. 30 days, money back guarantee."
+          }
+        }
+      },
+      "block_order": ["guarantee"]
+    }
+  ]
+}
+{% endschema %}

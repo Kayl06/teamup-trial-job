@@ -1,0 +1,68 @@
+<div class="details-section" {{ block.shopify_attributes }}>
+  {% content_for 'blocks' %}
+</div>
+
+{% stylesheet %}
+  .details-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    color: #251f1a;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:names.details_section",
+  "tag": null,
+  "blocks": [
+    {
+      "type": "suitable-for"
+    },
+    {
+      "type": "use-it"
+    }
+  ],
+  "settings": [],
+  "presets": [
+    {
+      "name": "t:names.details_section",
+      "blocks": {
+        "suitable": {
+          "type": "suitable-for",
+          "settings": {
+            "heading": "Suitable For:"
+          },
+          "blocks": {
+            "item-1": { "type": "detail-item", "settings": { "text": "ALL HAIR TYPES" } },
+            "item-2": { "type": "detail-item", "settings": { "text": "STRAIGHT" } },
+            "item-3": { "type": "detail-item", "settings": { "text": "WAVY" } },
+            "item-4": { "type": "detail-item", "settings": { "text": "CURLY" } },
+            "item-5": { "type": "detail-item", "settings": { "text": "COILY" } },
+            "item-6": { "type": "detail-item", "settings": { "text": "EXTENSIONS" } },
+            "item-7": { "type": "detail-item", "settings": { "text": "COLOUR-TREATED" } },
+            "item-8": { "type": "detail-item", "settings": { "text": "KERATIN & NANOPLASTY TREATED" } }
+          },
+          "block_order": ["item-1", "item-2", "item-3", "item-4", "item-5", "item-6", "item-7", "item-8"]
+        },
+        "use": {
+          "type": "use-it",
+          "settings": {
+            "heading": "Use it:"
+          },
+          "blocks": {
+            "item-1": { "type": "detail-item", "settings": { "text": "SALT WATER & CHLORINE PROTECTANT" } },
+            "item-2": { "type": "detail-item", "settings": { "text": "HEAT PROTECTANT" } },
+            "item-3": { "type": "detail-item", "settings": { "text": "PRE-SHAMPOO TREATMENT" } },
+            "item-4": { "type": "detail-item", "settings": { "text": "CURL DEFINING CREAM" } },
+            "item-5": { "type": "detail-item", "settings": { "text": "SLICK BACK CREAM" } }
+          },
+          "block_order": ["item-1", "item-2", "item-3", "item-4", "item-5"]
+        }
+      },
+      "block_order": ["suitable", "use"]
+    }
+  ]
+}
+{% endschema %}

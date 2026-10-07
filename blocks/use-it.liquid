@@ -1,0 +1,68 @@
+<div class="details-group" {{ block.shopify_attributes }}>
+  {%- if block.settings.heading != blank -%}
+    <h2 class="details-group__heading">{{ block.settings.heading }}</h2>
+  {%- endif -%}
+  <div class="details-group__items">
+    {% content_for 'blocks' %}
+  </div>
+</div>
+
+{% stylesheet %}
+  .details-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    color: #251f1a;
+  }
+
+  .details-group__heading {
+    margin: 0;
+    color: #251f1a;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .details-group__items {
+    width: 100%;
+    padding-left: 10px;
+    border-left: 1px solid #251f1a;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:names.use_it",
+  "tag": null,
+  "blocks": [
+    {
+      "type": "detail-item"
+    }
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:settings.heading",
+      "default": "Use it:"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.use_it",
+      "settings": {
+        "heading": "Use it:"
+      },
+      "blocks": {
+        "item-1": { "type": "detail-item", "settings": { "text": "SALT WATER & CHLORINE PROTECTANT" } },
+        "item-2": { "type": "detail-item", "settings": { "text": "HEAT PROTECTANT" } },
+        "item-3": { "type": "detail-item", "settings": { "text": "PRE-SHAMPOO TREATMENT" } },
+        "item-4": { "type": "detail-item", "settings": { "text": "CURL DEFINING CREAM" } },
+        "item-5": { "type": "detail-item", "settings": { "text": "SLICK BACK CREAM" } }
+      },
+      "block_order": ["item-1", "item-2", "item-3", "item-4", "item-5"]
+    }
+  ]
+}
+{% endschema %}
